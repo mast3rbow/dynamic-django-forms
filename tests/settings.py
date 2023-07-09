@@ -19,3 +19,5 @@ INSTALLED_APPS = (
     'dynamic_forms',
     'tests',
 )
+
+DYNAMIC_FORMS_CUSTOM_JS =""
