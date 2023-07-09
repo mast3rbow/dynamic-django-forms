@@ -73,6 +73,10 @@ def _process_paragraph(field_json):
     field.widget = HTMLFieldWidget(params=field_json)
     return field
 
+def _process_file(field_json):
+    upload = 
+    return forms.FileField(upload_to=field_json.get("upload_to", None)
+
 
 TYPE_MAPPING = {
     'checkbox-group': _process_checkbox,

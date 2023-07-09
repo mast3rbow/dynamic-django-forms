@@ -1,7 +1,7 @@
 <fieldset><div id="fb-editor"></div></fieldset>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-<script src="https://formbuilder.online/assets/js/form-builder.min.js"></script>
+ <script src="https://formbuilder.online/assets/js/form-builder.min.js"></script>
 <script>
     $(document).ready(function () {
         var textArea = $('[name="{{ widget.name }}"]')
@@ -14,10 +14,10 @@
                 'other',
             ],
             disabledSubtypes: {
-                text: ['color', 'tel', 'password'],
+                text: ['color', 'password'],
                 textarea: ['tinymce'],
             },
-            disableFields: ['autocomplete', 'button', 'file', 'starRating', ],
+            disableFields: ['autocomplete', 'button', 'starRating', ],
             editOnAdd: true,
             fields: [{
                 label: "Email",
