@@ -52,7 +52,6 @@ class FormRenderField(forms.MultiValueField):
 
     def compress(self, data):
         result = {}
-        print(data)
         for i, val in enumerate(data):
             if self.fields[i].__class__.__name__ == "HTMLField":
                 result[f"HTML_{i}"] = self.fields[i].widget.widget_label, val
