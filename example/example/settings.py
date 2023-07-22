@@ -125,5 +125,9 @@ STATIC_URL = "/static/"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-USE_CRISPY = True
+USE_CRISPY = False
 DYNAMIC_FORMS_CUSTOM_JS = ""
+
+# Path: example\example\settings.py
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

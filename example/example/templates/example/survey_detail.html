@@ -10,6 +10,7 @@
 <p>Responses</p>
 <hr>
 {% for surveyresponse in object.surveyresponse_set.all %}
+    {{surveyresponse.response.items}}
 <ul>
     {% for k, v in surveyresponse.response.items %}
     <li><strong>{{k}}: </strong> {{v}}</li>

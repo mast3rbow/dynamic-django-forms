@@ -11,7 +11,7 @@ class FormBuilderWidget(forms.Textarea):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context['DYNAMIC_FORMS_CUSTOM_JS'] = settings.DYNAMIC_FORMS_CUSTOM_JS
+        context["DYNAMIC_FORMS_CUSTOM_JS"] = settings.DYNAMIC_FORMS_CUSTOM_JS
         return context
 
     def format_value(self, value):
@@ -33,11 +33,23 @@ class HTMLFieldWidget(HTMLField):
         self.params = params
         super().__init__(attrs)
 
+    @property
+    def widget_label(self):
+        return self.params["subtype"]
+
     def render(self, name, value, attrs=None, renderer=None):
-        class_html = ''
-        if 'className' in self.params:
-            class_html = " class='{0}'".format(self.params['className'])
-        return format_html("<{0}{2}>{1}</{0}>".format(self.params['subtype'], self.params['label'], class_html))
+        class_html = ""
+        if "className" in self.params:
+            class_html = " class='{0}'".format(self.params["className"])
+        htmlfield = format_html(
+            "<{0}{2}>{1}</{0}>".format(
+                self.params["subtype"], self.params["label"], class_html
+            )
+        )
+        htmlfield += format_html(
+            f"<input type='hidden' id='{name}' name='{name}' value='{self.params['label']}'></input>"
+        )
+        return htmlfield
 
     def get(self):
         return False
@@ -46,10 +58,10 @@ class HTMLFieldWidget(HTMLField):
         return False
 
     def id_for_label(self, id):
-        return ''
+        return self.label
 
     def get_context(self):
-        return {'name': ''}
+        return {"name": ""}
 
     def value_from_datadict(self, data, files, name):
         return data.get(name)

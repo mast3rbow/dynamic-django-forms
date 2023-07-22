@@ -6,20 +6,20 @@ from .utils import gen_fields_from_json
 
 class FormBuilderField(forms.CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['widget'] = FormBuilderWidget
+        kwargs["widget"] = FormBuilderWidget
         return super().__init__(*args, **kwargs)
 
 
 class FormRenderField(forms.MultiValueField):
     def __init__(self, form_json=[], required=False, **kwargs):
-        kwargs['error_messages'] = {
-            'incomplete': 'Please fill in all required fields.',
+        kwargs["error_messages"] = {
+            "incomplete": "Please fill in all required fields.",
         }
-        kwargs['fields'] = gen_fields_from_json(form_json)
-        kwargs['label'] = ""
-        kwargs['require_all_fields'] = False
-        kwargs['required'] = required
-        del kwargs['max_length']
+        kwargs["fields"] = gen_fields_from_json(form_json)
+        kwargs["label"] = ""
+        kwargs["require_all_fields"] = False
+        kwargs["required"] = required
+        del kwargs["max_length"]
         super().__init__(**kwargs)
         self.configure_widget()
 
@@ -32,7 +32,7 @@ class FormRenderField(forms.MultiValueField):
 
     def _configure_new_fields(self, fields):
         for f in fields:
-            f.error_messages.setdefault('incomplete', self.error_messages['incomplete'])
+            f.error_messages.setdefault("incomplete", self.error_messages["incomplete"])
             if self.disabled:
                 f.disabled = True
             if self.require_all_fields:
@@ -52,6 +52,10 @@ class FormRenderField(forms.MultiValueField):
 
     def compress(self, data):
         result = {}
+        print(data)
         for i, val in enumerate(data):
-            result[self.fields[i].label] = val
+            if self.fields[i].__class__.__name__ == "HTMLField":
+                result[f"HTML_{i}"] = self.fields[i].widget.widget_label, val
+            else:
+                result[f"{self.fields[i].label}_{i}"] = self.fields[i].label, val
         return result

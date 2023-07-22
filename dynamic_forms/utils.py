@@ -2,6 +2,7 @@ from django import forms
 from django.utils.html import strip_tags
 from .forms import HTMLField
 from .widgets import HTMLFieldWidget
+from django.core.validators import RegexValidator
 
 
 def _process_checkbox(field_json):
@@ -30,7 +31,7 @@ def _process_number(field_json):
     return forms.FloatField(
         min_value=field_json.get("min", None),
         max_value=field_json.get("max", None),
-        widget=forms.NumberInput(attrs={'step': field_json.get("step", "any")})
+        widget=forms.NumberInput(attrs={"step": field_json.get("step", "any")}),
     )
 
 
@@ -43,13 +44,24 @@ def _process_radio(field_json):
 
 
 def _process_select(field_json):
-    if (field_json.get('multiple', False)):
+    if field_json.get("multiple", False):
         return forms.MultipleChoiceField()
     return forms.ChoiceField()
 
 
 def _process_text_input(field_json):
     return forms.CharField(max_length=field_json.get("maxlength", None))
+
+
+def _process_tel_input(field_json):
+    field = forms.CharField(max_length=field_json.get("maxlength", None))
+    field.validators = [
+        RegexValidator(
+            r"^\+?1?\d{9,15}$",
+            message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+        )
+    ]
+    return field
 
 
 def _process_text_area(field_json):
@@ -73,60 +85,65 @@ def _process_paragraph(field_json):
     field.widget = HTMLFieldWidget(params=field_json)
     return field
 
+
 def _process_file(field_json):
-    upload = 
-    return forms.FileField(upload_to=field_json.get("upload_to", None)
+    return forms.FileField()
 
 
 TYPE_MAPPING = {
-    'checkbox-group': _process_checkbox,
-    'date': _process_date,
-    'email': _process_email,
-    'hidden': _process_hidden,
-    'number': _process_number,
-    'radio-group': _process_radio,
-    'select': _process_select,
-    'text': _process_text_input,
-    'textarea': _process_text_area,
-    'header': _process_heading,
-    'paragraph': _process_paragraph,
-    'url': _process_url
+    "checkbox-group": _process_checkbox,
+    "date": _process_date,
+    "email": _process_email,
+    "hidden": _process_hidden,
+    "number": _process_number,
+    "radio-group": _process_radio,
+    "select": _process_select,
+    "text": _process_text_input,
+    "textarea": _process_text_area,
+    "header": _process_heading,
+    "paragraph": _process_paragraph,
+    "url": _process_url,
+    "file": _process_file,
+    "tel": _process_tel_input,
 }
 
 
 def process_field_from_json(field_json):
     if not isinstance(field_json, dict):
         raise TypeError("Each field JSON must be a dictionary")
-    field_type = field_json['type']
-    if field_type == 'text':
-        field_type = field_json.get('subtype', 'text')
+    field_type = field_json["type"]
+    if field_type == "text":
+        field_type = field_json.get("subtype", "text")
+    if field_type == "tel":
+        field_type = field_json.get("subtype", "tel")
     common_field_attrs = {
-        'required': field_json.get('required', False),
-        'label': strip_tags(field_json.get('label', None)),
-        'initial': field_json.get('value', None),
-        'help_text': field_json.get('description', None),
+        "required": field_json.get("required", False),
+        "label": strip_tags(field_json.get("label", None)),
+        "initial": field_json.get("value", None),
+        "help_text": field_json.get("description", None),
     }
 
     common_widget_attrs = {
-        'required': field_json.get('required', False),
-        'placeholder': field_json.get('placeholder', False),
-        'class': field_json.get('className', False),
+        "required": field_json.get("required", False),
+        "placeholder": field_json.get("placeholder", False),
+        "class": field_json.get("className", False),
     }
+
     field = TYPE_MAPPING[field_type](field_json)
     for attr, val in common_field_attrs.items():
-        if field_type not in ['paragraph', 'header', 'hidden']:
+        if field_type not in ["paragraph", "header", "hidden"]:
             setattr(field, attr, val)
-    if field_type not in ['radio-group', 'hidden']:
+    if field_type not in ["radio-group", "hidden"]:
         for attr, val in common_widget_attrs.items():
             field.widget.attrs[attr] = val
-    if field_type in ['checkbox-group', 'radio-group', 'select']:
+    if field_type in ["checkbox-group", "radio-group", "select"]:
         choices = [
-            (choice['value'], choice['label']) for choice in field_json['values']
+            (choice["value"], choice["label"]) for choice in field_json["values"]
         ]
         field.choices = choices
         field.widget.choices = choices
-    if field_type == 'hidden':
-        setattr(field, 'initial', field_json.get('value', None))
+    if field_type == "hidden":
+        setattr(field, "initial", field_json.get("value", None))
     return field
 
 
