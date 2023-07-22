@@ -55,10 +55,14 @@ class FormRenderField(forms.MultiValueField):
         for i, val in enumerate(data):
             if self.fields[i].__class__.__name__ == "HTMLField":
                 result[f"HTML_{i}"] = dict(
-                    type=self.fields[i].widget.widget_label, value=val
+                    field_type=self.fields[i].widget.__class__.__name__,
+                    field_name=self.fields[i].widget.widget_label,
+                    value=val,
                 )
             else:
-                result[f"{self.fields[i].label}_{i}"] = dict(
-                    type=self.fields[i].label, value=val
+                result[f"{self.fields[i].widget.__class__.__name__}_{i}"] = dict(
+                    field_type=self.fields[i].widget.__class__.__name__,
+                    field_name=self.fields[i].label,
+                    field_value=val,
                 )
         return result
