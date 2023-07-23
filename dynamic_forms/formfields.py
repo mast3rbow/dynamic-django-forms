@@ -57,7 +57,7 @@ class FormRenderField(forms.MultiValueField):
                 result[f"HTML_{i}"] = dict(
                     field_type=self.fields[i].widget.widget_label,
                     field_name="",
-                    value=val,
+                    field_value=val,
                 )
             else:
                 result[f"{self.fields[i].widget.__class__.__name__}_{i}"] = dict(
